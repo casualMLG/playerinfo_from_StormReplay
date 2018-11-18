@@ -27,7 +27,7 @@ def read_and_decode(filename):
 
 read_and_decode("Blackheart's Bay.StormReplay")
 
-def get_playerlevel_or_tag(lobby_data, playername, mode = 0):
+def get_playerlevel_or_tag(lobby_data, playername, get_tag = 0):
     tag = ""
     to_search = r'%s#(\d{4,8})' % playername
     r = re.compile(to_search)
@@ -35,7 +35,7 @@ def get_playerlevel_or_tag(lobby_data, playername, mode = 0):
     if s:
         tag = "%s#%s" % (playername, s.groups(0)[0])
         player_level = struct.unpack(">i", lobby_data[s.end():s.end()+4])[0]
-    if mode:
+    if get_tag:
         return tag
     else:
         return player_level
