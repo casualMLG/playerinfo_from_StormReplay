@@ -1,8 +1,8 @@
 from importlib import import_module
 import struct
 import re
-from hp.mpyq import mpyq
-from hp import protocol29406
+from heroprotocol.mpyq import mpyq
+from heroprotocol import protocol29406
 
 gametypes = {
     50001: 'QuickMatch',
@@ -17,7 +17,7 @@ gametypes = {
 archive = mpyq.MPQArchive("Blackheart's Bay.StormReplay")
 header = protocol29406.decode_replay_header(archive.header['user_data_header']['content'])
 baseBuild = header['m_version']['m_baseBuild']
-protocol = import_module('hp.protocol%s' % baseBuild,)
+protocol = import_module('heroprotocol.protocol%s' % baseBuild,)
 initdata = protocol.decode_replay_initdata(archive.read_file('replay.initData'))
 details = protocol.decode_replay_details(archive.read_file('replay.details'))
 attributes = protocol.decode_replay_attributes_events(archive.read_file('replay.attributes.events'))
