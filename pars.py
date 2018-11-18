@@ -14,14 +14,18 @@ gametypes = {
     50071: 'Team League',
 }
 
-archive = mpyq.MPQArchive("Blackheart's Bay.StormReplay")
-header = protocol29406.decode_replay_header(archive.header['user_data_header']['content'])
-baseBuild = header['m_version']['m_baseBuild']
-protocol = import_module('heroprotocol.protocol%s' % baseBuild,)
-initdata = protocol.decode_replay_initdata(archive.read_file('replay.initData'))
-details = protocol.decode_replay_details(archive.read_file('replay.details'))
-attributes = protocol.decode_replay_attributes_events(archive.read_file('replay.attributes.events'))
-lobby_data = archive.read_file('replay.server.battlelobby')
+def read_and_decode(filename):
+    global initdata, details, attributes, lobby_data
+    archive = mpyq.MPQArchive(filename)
+    header = protocol29406.decode_replay_header(archive.header['user_data_header']['content'])
+    baseBuild = header['m_version']['m_baseBuild']
+    protocol = import_module('heroprotocol.protocol%s' % baseBuild,)
+    initdata = protocol.decode_replay_initdata(archive.read_file('replay.initData'))
+    details = protocol.decode_replay_details(archive.read_file('replay.details'))
+    attributes = protocol.decode_replay_attributes_events(archive.read_file('replay.attributes.events'))
+    lobby_data = archive.read_file('replay.server.battlelobby')
+
+read_and_decode("Blackheart's Bay.StormReplay")
 
 def get_playerlevel_or_tag(lobby_data, playername, mode = 0):
     tag = ""
@@ -36,18 +40,37 @@ def get_playerlevel_or_tag(lobby_data, playername, mode = 0):
     else:
         return player_level
 
+def did_player_win(list_index):
+    if details['m_playerList'][list_index]['m_result'] == 2:
+        return True
+    return False
 
-gametypeID = initdata['m_syncLobbyState']['m_gameDescription']['m_gameOptions']['m_ammId']
-print(details['m_title'] +' - '+ gametypes[gametypeID])
+def get_gametype():
+    gametypeID = initdata['m_syncLobbyState']['m_gameDescription']['m_gameOptions']['m_ammId']
+    return gametypes[gametypeID]
 
-if details['m_playerList'][0]['m_result'] == 2:
+def get_map():
+    return details['m_title']
+
+def get_player_name(list_index):
+    return details['m_playerList'][list_index]['m_name']
+
+def get_hero(list_index):
+    return details['m_playerList'][list_index]['m_hero']
+
+def get_herolevel(list_index): #starts from 1 instead of 0
+    return int(attributes['scopes'][list_index+1][4008][0]['value'].strip())
+
+print(get_map() +' - '+ get_gametype())
+
+if did_player_win(0):
     print('Firts 5 players won.')
 else:
     print('The last 5 players won.')
 
-for p in range(10):
-    name = details['m_playerList'][p]['m_name']
-    hero = details['m_playerList'][p]['m_hero']
+for player_index in range(10):
+    name = get_player_name(player_index)
+    hero = get_hero(player_index)
     playerlevel = get_playerlevel_or_tag(lobby_data, name)
-    herolevel = attributes['scopes'][p+1][4008][0]['value'].strip()
-    print('level ' + str(playerlevel) + ' ' + name + ' played ' + hero + ' (level ' + herolevel + ')')
+    herolevel = get_herolevel(player_index)
+    print('level ' + str(playerlevel) + ' ' + name + ' played ' + hero + ' (level ' + str(herolevel) + ')')
