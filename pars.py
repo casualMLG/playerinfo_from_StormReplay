@@ -23,7 +23,7 @@ def read_and_decode(filename):
     initdata = protocol.decode_replay_initdata(archive.read_file('replay.initData'))
     details = protocol.decode_replay_details(archive.read_file('replay.details'))
     attributes = protocol.decode_replay_attributes_events(archive.read_file('replay.attributes.events'))
-    lobby_data = archive.read_file('replay.server.battlelobby')
+    lobby_data = archive.read_file('replay.server.battlelobby') #loby_data is not decoded file content
 
 read_and_decode("Blackheart's Bay.StormReplay")
 
