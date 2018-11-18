@@ -31,10 +31,10 @@ def get_playerlevel_or_tag(playername, get_tag = 0):
     tag = ""
     to_search = r'%s#(\d{4,8})' % playername
     r = re.compile(to_search)
-    s = r.search(lobby_data)
+    s = r.search(lobby_data) #returns a match object. s.end() returns the end index of the match in stream
     if s:
         tag = "%s#%s" % (playername, s.groups(0)[0])
-        player_level = struct.unpack(">i", lobby_data[s.end():s.end()+4])[0]
+        player_level = struct.unpack(">i", lobby_data[s.end():s.end()+4])[0] #convert 4 bytes after match
     if get_tag:
         return tag
     else:
