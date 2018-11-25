@@ -158,5 +158,3 @@ def test_file(folder, file_index = 0):
         print('level ' + str(playerlevel) + ' ' + name + ' played ' + hero + ' (level ' + str(herolevel) + ')')
 
 make_database('test')
-#test_file('muu',2)
-#test_folder('muu')
